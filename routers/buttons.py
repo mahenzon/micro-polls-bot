@@ -4,13 +4,13 @@ from aiogram.types import (
     CallbackQuery,
 )
 
+from storage.data import Data
 from utils.compression import (
     decode_and_decompress,
-    decode_data,
 )
+from utils.poll_data_extractor import extract_data
 from utils.poll_params import prepare_poll_data
-from utils.url_data import extract_data_url
-from utils.consts import URL_FOR_DATA, QUESTION_SEP
+from utils.consts import QUESTION_SEP
 
 router = Router(name="buttons")
 
@@ -20,31 +20,43 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
     await query.answer("Cool!")
     question_data = decode_and_decompress(query.data)
     question, *answers = question_data.split(QUESTION_SEP)
-    question, answers_kb = prepare_poll_data(
+    message_text, answers_kb = prepare_poll_data(
         question=question,
         answers=answers,
     )
     await query.bot.send_message(
         chat_id=query.from_user.id,
-        text=question,
+        text=message_text,
         reply_markup=answers_kb,
         parse_mode=ParseMode.HTML,
     )
 
 
-@router.callback_query(F.message.text)
-async def handle_callback_message_has_text(query: CallbackQuery) -> None:
-    data_url = extract_data_url(query.message.entities)
+@router.callback_query(
+    F.message.text,
+    F.message.entities,
+    F.message.func(extract_data).as_("extracted_data"),
+)
+async def handle_callback_message_has_text_end_entity(
+    query: CallbackQuery,
+    extracted_data: Data,
+) -> None:
     message_text = query.message.text
     print("message id:", query.message.message_id)
     print("message text:", message_text)
     print("cb data:", query.data)
     print("entities:", query.message.entities)
 
-    if not data_url:
-        await query.answer("No data available")
-        return
-    data = decode_data(data_url.removeprefix(URL_FOR_DATA))
-    print("data url:", data_url)
-    print("data.data:", data.data)
-    await query.answer()
+    print("data.data:", extracted_data.data)
+    await query.answer("Works!")
+
+
+@router.callback_query(
+    F.message.text,
+    F.message.entities,
+    F.func(extract_data).as_("extracted_data"),
+)
+async def handle_callback_invalid(
+    query: CallbackQuery,
+) -> None:
+    await query.answer("No data available")
