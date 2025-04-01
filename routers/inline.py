@@ -1,5 +1,3 @@
-import base64
-
 from aiogram import Router, types
 from aiogram.types import (
     InputTextMessageContent,
@@ -8,16 +6,9 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
+from utils.compression import compress_string
+
 router = Router(name="inline")
-
-
-def compress_string(text: str) -> str:
-    """
-    TODO: compress using zlib
-    base64 encode
-    """
-    encoded_data = base64.urlsafe_b64encode(text.encode())
-    return encoded_data.decode()
 
 
 @router.inline_query()

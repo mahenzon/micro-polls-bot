@@ -1,5 +1,3 @@
-import base64
-
 from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.types import (
@@ -10,17 +8,11 @@ from aiogram.types import (
 )
 from aiogram.utils import markdown
 
+from storage.data import Data
+from utils.compression import decode_and_decompress, compress_string
+from utils.url_data import URL_FOR_DATA
+
 router = Router(name="buttons")
-
-
-def decode_and_decompress(encoded_data: str) -> str:
-    """
-    Decode the Base64 data
-    TODO: Decompress the data using zlib
-    """
-    string_data = base64.urlsafe_b64decode(encoded_data)
-
-    return string_data.decode()
 
 
 @router.callback_query(F.inline_message_id)
@@ -40,9 +32,16 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
             ]
         ]
     )
-    data_with_link = "https://t.me?q=wasdqwerty"
+    data = Data(
+        data={
+            "foo": [1, 2, 3],
+            "bar": [4, 5, 6],
+        },
+    )
+    compressed_data = compress_string(data.model_dump_json())
+    link_with_data = f"{URL_FOR_DATA}{compressed_data}"
     question = markdown.text(
-        markdown.hide_link(data_with_link),
+        markdown.hide_link(link_with_data),
         markdown.html_decoration.quote(question),
     )
     await query.bot.send_message(
@@ -55,7 +54,7 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
 
 def extract_data_url(entities: list[MessageEntity]) -> str | None:
     for entity in entities:
-        if entity.url and entity.url.startswith("https://t.me/?q="):
+        if entity.url and entity.url.startswith(URL_FOR_DATA):
             return entity.url
 
     return None
@@ -64,11 +63,16 @@ def extract_data_url(entities: list[MessageEntity]) -> str | None:
 @router.callback_query(F.message.text)
 async def handle_callback_message_has_text(query: CallbackQuery) -> None:
     data_url = extract_data_url(query.message.entities)
-    if not data_url:
-        await query.answer("No data available")
-        return
     message_text = query.message.text
     print("message text:", message_text)
     print("cb data:", query.data)
+    print("entities:", query.message.entities)
+
+    if not data_url:
+        await query.answer("No data available")
+        return
+    decompressed_data = decode_and_decompress(data_url.removeprefix(URL_FOR_DATA))
+    data = Data.model_validate_json(decompressed_data)
     print("data url:", data_url)
+    print("data.data:", data.data)
     await query.answer()
