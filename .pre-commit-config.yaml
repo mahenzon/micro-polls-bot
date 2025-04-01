@@ -27,11 +27,12 @@ repos:
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.6.11
+    rev: 0.6.3
     hooks:
       - id: uv-export
         args:
           - --frozen
           - --no-header
           - --no-hashes
+          - --no-default-groups
           - --output-file=requirements.txt
