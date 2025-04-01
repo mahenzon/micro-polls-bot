@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     )
 
     telegram_api_token: str
+    api_gateway_url: str = ""
 
 
 # noinspection PyArgumentList
