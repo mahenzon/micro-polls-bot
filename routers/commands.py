@@ -29,10 +29,9 @@ async def poll_command(
         )
         return None
 
+    text, keyboard = poll_params.build()
     await message.reply(
-        text=markdown.text(
-            poll_params.question_text,
-            poll_params.description,
-            sep="\n",
-        )
+        text=text,
+        reply_markup=keyboard,
+        parse_mode=ParseMode.HTML,
     )
