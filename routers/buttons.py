@@ -9,7 +9,11 @@ from aiogram.types import (
 from aiogram.utils import markdown
 
 from storage.data import Data
-from utils.compression import decode_and_decompress, compress_string
+from utils.compression import (
+    decode_and_decompress,
+    compress_data,
+    decode_data,
+)
 from utils.url_data import URL_FOR_DATA
 
 router = Router(name="buttons")
@@ -38,7 +42,7 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
             "bar": [4, 5, 6],
         },
     )
-    compressed_data = compress_string(data.model_dump_json())
+    compressed_data = compress_data(data)
     link_with_data = f"{URL_FOR_DATA}{compressed_data}"
     question = markdown.text(
         markdown.hide_link(link_with_data),
@@ -71,8 +75,7 @@ async def handle_callback_message_has_text(query: CallbackQuery) -> None:
     if not data_url:
         await query.answer("No data available")
         return
-    decompressed_data = decode_and_decompress(data_url.removeprefix(URL_FOR_DATA))
-    data = Data.model_validate_json(decompressed_data)
+    data = decode_data(data_url.removeprefix(URL_FOR_DATA))
     print("data url:", data_url)
     print("data.data:", data.data)
     await query.answer()
