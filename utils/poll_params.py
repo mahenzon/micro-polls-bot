@@ -1,8 +1,8 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils import markdown
 from pydantic import BaseModel, ConfigDict
-
 from storage.poll_data import PollData
+
 from utils.compression import compress_data
 from utils.consts import (
     QUESTION_SEP,

@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.types import MessageEntity
-
 from storage.poll_data import PollData
+
 from utils.compression import decode_data
 from utils.consts import URL_FOR_DATA
 

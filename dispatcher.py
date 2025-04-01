@@ -1,7 +1,6 @@
 __all__ = ("create_dispatcher",)
 
 from aiogram import Dispatcher
-
 from routers.main import router as main_router
 
 

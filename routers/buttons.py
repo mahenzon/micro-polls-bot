@@ -1,20 +1,19 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.enums import ParseMode
 from aiogram.types import (
     CallbackQuery,
 )
-
 from storage.poll_data import PollData
 from utils.compression import (
     decode_and_decompress,
 )
+from utils.consts import QUESTION_SEP
 from utils.poll_data_extraction import (
     extract_poll_data,
     extract_question_from_message_text,
 )
-from utils.poll_params import prepare_poll_data, prepare_message_text_with_data_link
-from utils.consts import QUESTION_SEP
-from utils.polls import handle_vote, RESULTS_MAP
+from utils.poll_params import prepare_message_text_with_data_link, prepare_poll_data
+from utils.polls import RESULTS_MAP, handle_vote
 
 router = Router(name="buttons")
 

@@ -1,8 +1,6 @@
 import asyncio
 import logging
 
-from aiogram import Dispatcher
-
 from bot import create_bot
 from dispatcher import create_dispatcher
 

@@ -1,11 +1,10 @@
 from aiogram import Router, types
 from aiogram.enums import ParseMode
 from aiogram.types import (
-    InputTextMessageContent,
     InlineQueryResultArticle,
+    InputTextMessageContent,
 )
 from aiogram.utils import markdown
-
 from utils.polls import prepare_poll_parameters_data, prepare_send_poll_keyboard
 
 router = Router(name="inline")

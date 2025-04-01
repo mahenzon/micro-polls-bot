@@ -2,7 +2,6 @@ from aiogram import Router, types
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandObject
 from aiogram.utils import markdown
-
 from utils.polls import prepare_poll_parameters_data
 
 router = Router(name="commands")

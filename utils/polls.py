@@ -1,11 +1,11 @@
 from typing import Literal
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from storage.poll_data import PollData
-from utils.poll_params import PollParams
+
 from utils.compression import compress_string
 from utils.consts import QUESTION_SEP
+from utils.poll_params import PollParams
 
 VOTE_HANDLE_RESULT = Literal["added", "removed"]
 
@@ -17,7 +17,6 @@ RESULTS_MAP: dict[VOTE_HANDLE_RESULT, str] = {
 
 
 def prepare_poll_parameters_data(input_query: str) -> PollParams:
-
     if input_query and QUESTION_SEP in input_query:
         question_text, *answers = input_query.split(QUESTION_SEP)
         title = question_text
@@ -49,7 +48,7 @@ def prepare_send_poll_keyboard(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text=f"Press me!",
+                    text="Press me!",
                     callback_data=compress_string(question_data_string),
                 ),
             ],
