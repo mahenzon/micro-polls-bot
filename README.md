@@ -1,4 +1,10 @@
 
+Example 
+```shell
+uv export --no-header --no-hashes --output-file requirements.txt
+```
+
+
 Some notes:
 
 https://github.com/github/gitignore/blob/main/Python.gitignore
