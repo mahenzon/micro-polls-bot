@@ -10,7 +10,8 @@ log = logging.getLogger(__name__)
 async def run() -> None:
     bot = create_bot()
     dispatcher = create_dispatcher()
-
+    log.warning("Delete webhook")
+    await bot.delete_webhook()
     await dispatcher.start_polling(bot)
 
 
