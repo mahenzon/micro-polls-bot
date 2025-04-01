@@ -1,7 +1,14 @@
 import base64
 
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.enums import ParseMode
+from aiogram.types import (
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    MessageEntity,
+)
+from aiogram.utils import markdown
 
 router = Router(name="buttons")
 
@@ -33,22 +40,35 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
             ]
         ]
     )
+    data_with_link = "https://t.me?q=wasdqwerty"
+    question = markdown.text(
+        markdown.hide_link(data_with_link),
+        markdown.html_decoration.quote(question),
+    )
     await query.bot.send_message(
         chat_id=query.from_user.id,
-        text=question.strip(),
+        text=question,
         reply_markup=answers_kb,
+        parse_mode=ParseMode.HTML,
     )
+
+
+def extract_data_url(entities: list[MessageEntity]) -> str | None:
+    for entity in entities:
+        if entity.url and entity.url.startswith("https://t.me/?q="):
+            return entity.url
+
+    return None
 
 
 @router.callback_query(F.message.text)
 async def handle_callback_message_has_text(query: CallbackQuery) -> None:
-    if not (query.message and query.message.text):
-        await query.answer("No message text found.")
+    data_url = extract_data_url(query.message.entities)
+    if not data_url:
+        await query.answer("No data available")
         return
-
     message_text = query.message.text
-    entities = query.message.entities
     print("message text:", message_text)
-    print("entities:", entities)
     print("cb data:", query.data)
+    print("data url:", data_url)
     await query.answer()
