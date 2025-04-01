@@ -1,10 +1,20 @@
 from aiogram import Router, types
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.utils import markdown
 from utils.polls import prepare_poll_parameters_data
 
 router = Router(name="commands")
+
+
+@router.message(CommandStart())
+async def handle_command_start(message: types.Message):
+    await message.answer("Send /poll")
+
+
+@router.message(Command("help"))
+async def handle_command_help(message: types.Message):
+    await message.answer("Send /poll to create poll. Any questions? @SurenTalk")
 
 
 @router.message(Command("poll", prefix="!/"))
