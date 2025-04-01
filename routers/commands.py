@@ -38,6 +38,12 @@ async def poll_command(
         )
         return None
 
+    if not poll_params.question_text:
+        await message.reply(text="No question text found. Try better.")
+        return
+    if len(poll_params.answers) != len(set(poll_params.answers)):
+        await message.reply(text="Options have to be unique.")
+        return
     text, keyboard = poll_params.build()
     await message.reply(
         text=text,

@@ -6,7 +6,6 @@ from storage.poll_data import PollData
 
 def compress_string(text: str) -> str:
     """
-    TODO: compress using zlib
     base64 encode
     """
     compressed_data = zlib.compress(text.encode())
@@ -17,7 +16,6 @@ def compress_string(text: str) -> str:
 def decode_and_decompress(encoded_data: str) -> str:
     """
     Decode the Base64 data
-    TODO: Decompress the data using zlib
     """
     string_data = base64.urlsafe_b64decode(encoded_data)
     serialized_data = zlib.decompress(string_data)

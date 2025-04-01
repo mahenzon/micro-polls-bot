@@ -20,7 +20,11 @@ def extract_poll_data(message: types.Message) -> PollData:
 
 
 def extract_question_from_message_text(message_text: str) -> str:
-    return message_text.strip().split(
-        "\n",
-        maxsplit=1,
-    )[0]
+    return (
+        message_text.replace("\u200b", "")
+        .strip()
+        .split(
+            "\n",
+            maxsplit=1,
+        )[0]
+    )

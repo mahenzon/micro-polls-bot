@@ -1,10 +1,12 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils import markdown
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from pydantic import BaseModel, ConfigDict
 from storage.poll_data import PollData
 
 from utils.compression import compress_data
 from utils.consts import (
+    MAX_KEYBOARD_ROW_SIZE,
     QUESTION_SEP,
     URL_FOR_DATA,
 )
@@ -41,8 +43,8 @@ def prepare_poll_data(
     answers: list[str],
     poll_data: PollData | None = None,
 ) -> tuple[str, InlineKeyboardMarkup]:
-    answers_kb = InlineKeyboardMarkup(
-        inline_keyboard=[
+    answers_kb_builder = InlineKeyboardBuilder(
+        markup=[
             [
                 InlineKeyboardButton(
                     text=answer.strip(),
@@ -56,7 +58,9 @@ def prepare_poll_data(
         question_text=question,
         poll_data=poll_data or PollData(data={}),
     )
-    return message_text, answers_kb
+    if len(answers) > MAX_KEYBOARD_ROW_SIZE:
+        answers_kb_builder.adjust(2)
+    return message_text, answers_kb_builder.as_markup()
 
 
 class PollParams(BaseModel):

@@ -69,7 +69,6 @@ def handle_vote(
         return "removed"
 
     for votes in poll_data.data.values():
-        if user_id in votes:
-            votes.discard(user_id)
+        votes.discard(user_id)
     poll_data.data[response].add(user_id)
     return "added"
