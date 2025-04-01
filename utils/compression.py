@@ -1,7 +1,7 @@
 import base64
 import zlib
 
-from storage.data import Data
+from storage.poll_data import PollData
 
 
 def compress_string(text: str) -> str:
@@ -25,11 +25,11 @@ def decode_and_decompress(encoded_data: str) -> str:
     return serialized_data.decode()
 
 
-def compress_data(data: Data) -> str:
+def compress_data(data: PollData) -> str:
     return compress_string(data.model_dump_json())
 
 
-def decode_data(encoded_data: str) -> Data:
-    return Data.model_validate_json(
+def decode_data(encoded_data: str) -> PollData:
+    return PollData.model_validate_json(
         decode_and_decompress(encoded_data),
     )

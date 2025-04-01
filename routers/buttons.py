@@ -4,13 +4,17 @@ from aiogram.types import (
     CallbackQuery,
 )
 
-from storage.data import Data
+from storage.poll_data import PollData
 from utils.compression import (
     decode_and_decompress,
 )
-from utils.poll_data_extractor import extract_data
-from utils.poll_params import prepare_poll_data
+from utils.poll_data_extraction import (
+    extract_poll_data,
+    extract_question_from_message_text,
+)
+from utils.poll_params import prepare_poll_data, prepare_message_text_with_data_link
 from utils.consts import QUESTION_SEP
+from utils.polls import handle_vote, RESULTS_MAP
 
 router = Router(name="buttons")
 
@@ -35,26 +39,35 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
 @router.callback_query(
     F.message.text,
     F.message.entities,
-    F.message.func(extract_data).as_("extracted_data"),
+    F.message.func(extract_poll_data).as_("poll_data"),
 )
 async def handle_callback_message_has_text_end_entity(
     query: CallbackQuery,
-    extracted_data: Data,
+    poll_data: PollData,
 ) -> None:
-    message_text = query.message.text
-    print("message id:", query.message.message_id)
-    print("message text:", message_text)
-    print("cb data:", query.data)
-    print("entities:", query.message.entities)
+    result = handle_vote(
+        poll_data=poll_data,
+        user_id=query.from_user.id,
+        response=query.data.strip(),
+    )
+    await query.answer(RESULTS_MAP[result])
 
-    print("data.data:", extracted_data.data)
-    await query.answer("Works!")
+    question_text = extract_question_from_message_text(query.message.text)
+    message_text = prepare_message_text_with_data_link(
+        question_text=question_text,
+        poll_data=poll_data,
+    )
+    await query.message.edit_text(
+        text=message_text,
+        reply_markup=query.message.reply_markup,
+        parse_mode=ParseMode.HTML,
+    )
 
 
 @router.callback_query(
     F.message.text,
     F.message.entities,
-    F.func(extract_data).as_("extracted_data"),
+    F.func(extract_poll_data).as_("extracted_data"),
 )
 async def handle_callback_invalid(
     query: CallbackQuery,
