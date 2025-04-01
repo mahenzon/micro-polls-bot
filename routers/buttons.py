@@ -14,7 +14,7 @@ from utils.compression import (
     compress_data,
     decode_data,
 )
-from utils.url_data import URL_FOR_DATA
+from utils.url_data import URL_FOR_DATA, QUESTION_SEP
 
 router = Router(name="buttons")
 
@@ -24,7 +24,7 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
     question_data = decode_and_decompress(query.data)
     await query.answer("Cool!")
 
-    question, *answers = question_data.split("|")
+    question, *answers = question_data.split(QUESTION_SEP)
     answers_kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
