@@ -1,24 +1,21 @@
 import asyncio
 
-from aiogram.types import Update
 from bot import create_bot
+from cloud_function_webhook_hanlder import CloudFunctionWebhookHandler
 from dispatcher import create_dispatcher
 
-
-async def handle_update(update: Update):
-    bot = create_bot()
-    dp = create_dispatcher()
-    return await dp.feed_update(bot, update)
-
-
-def prepare_update(event: dict[str, dict]):
-    return Update.model_validate(event["body"])
+dp = create_dispatcher()
+bot = create_bot()
+webhook_requests_handler = CloudFunctionWebhookHandler(
+    dispatcher=dp,
+    bot=bot,
+    handle_in_background=False,
+)
 
 
 def handle(event, context):
-    update = prepare_update(event)
-    asyncio.run(handle_update(update))
-    return {
-        "statusCode": 204,
-        "body": "",
-    }
+    return asyncio.get_event_loop().run_until_complete(
+        webhook_requests_handler.handle_yandex_cloud_function(
+            event=event,
+        ),
+    )

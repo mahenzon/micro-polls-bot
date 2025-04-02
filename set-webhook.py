@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 
 async def main() -> None:
     bot = create_bot()
+    log.warning("Me %s", await bot.get_me())
     log.warning("Delete webhook")
     await bot.delete_webhook()
     log.warning("Set webhook")

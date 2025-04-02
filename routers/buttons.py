@@ -1,3 +1,5 @@
+from typing import Any
+
 from aiogram import F, Router
 from aiogram.enums import ParseMode
 from aiogram.types import (
@@ -19,7 +21,7 @@ router = Router(name="buttons")
 
 
 @router.callback_query(F.inline_message_id)
-async def handle_callback_send_message(query: CallbackQuery) -> None:
+async def handle_callback_send_message(query: CallbackQuery) -> Any:
     await query.answer("Cool!")
     question_data = decode_and_decompress(query.data)
     question, *answers = question_data.split(QUESTION_SEP)
@@ -27,7 +29,7 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
         question=question,
         answers=answers,
     )
-    await query.bot.send_message(
+    return query.bot.send_message(
         chat_id=query.from_user.id,
         text=message_text,
         reply_markup=answers_kb,
@@ -43,7 +45,7 @@ async def handle_callback_send_message(query: CallbackQuery) -> None:
 async def handle_callback_message_has_text_end_entity(
     query: CallbackQuery,
     poll_data: PollData,
-) -> None:
+) -> Any:
     result = handle_vote(
         poll_data=poll_data,
         user_id=query.from_user.id,
@@ -56,7 +58,7 @@ async def handle_callback_message_has_text_end_entity(
         question_text=question_text,
         poll_data=poll_data,
     )
-    await query.message.edit_text(
+    return query.message.edit_text(
         text=message_text,
         reply_markup=query.message.reply_markup,
         parse_mode=ParseMode.HTML,
@@ -70,5 +72,5 @@ async def handle_callback_message_has_text_end_entity(
 )
 async def handle_callback_invalid(
     query: CallbackQuery,
-) -> None:
-    await query.answer("No data available")
+) -> Any:
+    return query.answer("No data available")
