@@ -1,12 +1,9 @@
-import io
 from typing import Any
 
-import aiohttp
 from aiogram import Router, types
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.utils import markdown
-from aiogram.utils.chat_action import ChatActionSender
 from utils.consts import MAX_ANSWER_SIZE
 from utils.polls import prepare_poll_parameters_data
 
@@ -55,28 +52,3 @@ async def poll_command(
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
     )
-
-
-async def send_big_file(message: types.Message):
-    file = io.BytesIO()
-    url = "https://images.unsplash.com/photo-1608848461950-0fe51dfc41cb"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            result_bytes = await response.read()
-
-    file.write(result_bytes)
-    return message.reply_document(
-        document=types.BufferedInputFile(
-            file=file.getvalue(),
-            filename="cat-big-pic.jpeg",
-        ),
-    )
-
-
-@router.message(Command("pic_file"))
-async def send_pic_file_buffered(message: types.Message) -> Any:
-    async with ChatActionSender.upload_document(
-        bot=message.bot,
-        chat_id=message.chat.id,
-    ):
-        return await send_big_file(message)
