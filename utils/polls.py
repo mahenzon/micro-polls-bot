@@ -18,7 +18,7 @@ RESULTS_MAP: dict[VOTE_HANDLE_RESULT, str] = {
 
 def prepare_poll_parameters_data(input_query: str) -> PollParams:
     if input_query and QUESTION_SEP in input_query:
-        question_text, *answers = input_query.split(QUESTION_SEP)
+        question_text, *answers = input_query.strip(QUESTION_SEP).split(QUESTION_SEP)
         title = question_text
         description = f"Answers: {f' {QUESTION_SEP} '.join(answers)}"
         example = False

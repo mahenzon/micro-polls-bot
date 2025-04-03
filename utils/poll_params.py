@@ -7,6 +7,7 @@ from storage.poll_data import PollData
 from utils.compression import compress_data
 from utils.consts import (
     MAX_KEYBOARD_ROW_SIZE,
+    MAX_ONE_ROW_ANSWER_SIZE,
     QUESTION_SEP,
     URL_FOR_DATA,
 )
@@ -58,7 +59,9 @@ def prepare_poll_data(
         question_text=question,
         poll_data=poll_data or PollData(data={}),
     )
-    if len(answers) > MAX_KEYBOARD_ROW_SIZE:
+    if any((len(answer) > MAX_ONE_ROW_ANSWER_SIZE for answer in answers)):
+        answers_kb_builder.adjust(1)
+    elif len(answers) > MAX_KEYBOARD_ROW_SIZE:
         answers_kb_builder.adjust(2)
     return message_text, answers_kb_builder.as_markup()
 
