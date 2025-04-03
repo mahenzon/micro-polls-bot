@@ -8,7 +8,7 @@ from aiogram.methods import TelegramMethod
 from aiogram.methods.base import TelegramType
 from aiogram.types import Update
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
-from aiohttp import JsonPayload, MultipartWriter, Payload
+from aiohttp import JsonPayload, Payload
 
 log = logging.getLogger(__name__)
 
@@ -25,9 +25,10 @@ class AsyncBytesIO:
         return self.buffer.getvalue()
 
 
-async def write_body_to_string(writer: MultipartWriter):
+async def write_body_to_string(writer: Payload):
     async_buffer = AsyncBytesIO()
 
+    # noinspection PyTypeChecker
     await writer.write(async_buffer)
 
     base64_encoded = base64.b64encode(async_buffer.getvalue()).decode("utf-8")
