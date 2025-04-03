@@ -3,10 +3,12 @@ import io
 import logging
 from typing import Any
 
+from aiogram import Bot
 from aiogram.methods import TelegramMethod
+from aiogram.methods.base import TelegramType
 from aiogram.types import Update
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
-from aiohttp import MultipartWriter
+from aiohttp import JsonPayload, MultipartWriter, Payload
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +37,22 @@ async def write_body_to_string(writer: MultipartWriter):
 
 class CloudFunctionWebhookHandler(SimpleRequestHandler):
     DEFAULT_STATUS_CODE = 200
+
+    def _build_response_writer(
+        self,
+        bot: Bot,
+        result: TelegramMethod[TelegramType] | None,
+    ) -> Payload:
+        """
+        # we need to return something "empty"
+        # and "empty" form doesn't work
+        # since it's sending only "end" boundary w/o "start"
+        https://github.com/aiogram/aiogram/pull/1665
+        """
+        if not result:
+            return JsonPayload({})
+
+        return super()._build_response_writer(bot, result)
 
     async def handle_raw_event(self, json_body: str) -> TelegramMethod[Any] | None:
         try:
